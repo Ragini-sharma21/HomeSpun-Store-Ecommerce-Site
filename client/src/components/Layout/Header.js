@@ -1,9 +1,20 @@
 import React from 'react'
 import {NavLink,Link} from 'react-router-dom'
 import {GiShoppingBag} from 'react-icons/gi'
-
+import { useAuth } from '../../context/auth';
+import toast from "react-hot-toast";
 
 const Header = () => {
+  const [auth, setAuth] = useAuth();
+  const handleLogout = () => {     //when click on logout clear localstorage
+    setAuth({
+      ...auth,
+      user: null,    //when user click on logout remove user and token ans clear localstorage
+      token: "",
+    });
+    localStorage.removeItem("auth");
+    toast.success("Logout Successfully");
+  };
   return (
    <>
 
@@ -38,16 +49,60 @@ const Header = () => {
                   Category
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink to="/register" className="nav-link">
-                  Register
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/login" className="nav-link">
-                  Login
-                </NavLink>
-              </li>
+                        {/* if user already dont exist show him login and register page initially false and if it exists then show him logout  */}
+
+              {!auth?.user ? (
+                <>
+                  <li className="nav-item">
+                    <NavLink to="/register" className="nav-link">
+                      Register
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/login" className="nav-link">
+                      Login
+                    </NavLink>
+                  </li>
+                </>
+              ) : (
+                
+                  
+                 <>
+                  <li className="nav-item dropdown">
+                    <NavLink
+                      className="nav-link dropdown-toggle"
+                      href="#"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      {auth?.user?.name}   {/*if auth is valid user is valid then get name of the user*/}
+                    </NavLink>
+                    <ul className="dropdown-menu">
+                      <li>
+                      <NavLink
+                          to={`/dashboard/${
+                            auth?.user?.role === 1 ? "admin" : "user"
+                          }`}
+                          className="dropdown-item"
+                        >
+                          Dashboard
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink
+                          onClick={handleLogout}
+                          to="/login"
+                          className="dropdown-item"
+                        >
+                          Logout
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                </>
+              )}
+              
               <li className="nav-item">
                 <NavLink to="/cart" className="nav-link">
                   Cart (0)

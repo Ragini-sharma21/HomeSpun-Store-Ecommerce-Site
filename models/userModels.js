@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    answer:{
+      type:String,
+      required:true,
+    },
     role: {
       type: Number,    // it is 0 then it is user if it is admin then it should be 1
       default: 0,
