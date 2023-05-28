@@ -5,15 +5,18 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from 'react-router-dom';
 import { AuthProvider } from './context/auth';
-import { Modal } from "antd";   //for edit functionality of category
+import {SearchProvider} from "./context/search";
+import "antd/dist/reset.css";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   
   <AuthProvider>
+    <SearchProvider>    {/*wrap kr diya ab hum kahin se bhi conntest ko use kr sakte hai*/}
   <BrowserRouter>
   <App />
   </BrowserRouter>
+  </SearchProvider>
   </AuthProvider>
   
 

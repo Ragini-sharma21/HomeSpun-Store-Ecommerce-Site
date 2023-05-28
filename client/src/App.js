@@ -21,6 +21,8 @@ import Profile from "./pages/user/Profile";
  import UpdateProduct from "./pages/Admin/UpdateProduct";
 import Products from './pages/Admin/Products';
 import Users from './pages/Admin/Users';
+import Search from './pages/Search';
+import ProductDetails from "./pages/ProductDetails";
 
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
    <>
    <Routes>
     <Route path='/' element={<HomePage/>}/> {/*Routes creation*/}
+    <Route path="/product/:slug" element={<ProductDetails />}/>
+    <Route path="/search" element={<Search/>}/>
     <Route path="/dashboard" element={<PrivateRoute/>}>   {/*pehle protected route check hoga fir nested route show krwaayenge*/}
       <Route path="user" element={<Dashboard/>}/>
       <Route path="user/orders" element={<Orders />} />
