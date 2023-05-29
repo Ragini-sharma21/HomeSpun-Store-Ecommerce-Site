@@ -1,6 +1,7 @@
 import productModel from "../models/productModel.js";
 import fs from "fs";      //file system to upload photo used with formidable
 import slugify from "slugify";
+import categoryModel from '../models/categoryModel.js';
 
 export const createProductController = async (req, res) => {
   try {

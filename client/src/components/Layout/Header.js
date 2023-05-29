@@ -1,12 +1,17 @@
 import React from 'react'
 import {NavLink,Link} from 'react-router-dom'
-import {GiShoppingBag} from 'react-icons/gi'
+import {GiAntibody, GiShoppingBag} from 'react-icons/gi'
 import { useAuth } from '../../context/auth';
 import toast from "react-hot-toast";
 import SearchInput from './Form/SearchInput';
+import useCategory from "../../hooks/useCategory";
+import {useCart} from "../../context/cart";
+import {Badge} from "antd";
 
 const Header = () => {
+  const [cart]=useCart();
   const [auth, setAuth] = useAuth();
+  const categories =useCategory();
   const handleLogout = () => {     //when click on logout clear localstorage
     setAuth({
       ...auth,
@@ -46,10 +51,31 @@ const Header = () => {
                   Home
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink to="/category" className="nav-link ">
-                  Category
-                </NavLink>
+              <li className="nav-item dropdown">
+                <Link
+                  className="nav-link dropdown-toggle"
+                  to={"/categories"}
+                  data-bs-toggle="dropdown"
+                >
+                  Categories
+                </Link>
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link className="dropdown-item" to={"/categories"}> {/*redirect us to category*/}
+                      All Categories
+                    </Link>
+                  </li>
+                  {categories?.map((c) => (
+                    <li>
+                      <Link
+                        className="dropdown-item"
+                        to={`/category/${c.slug}`}  //redirect to single category
+                      >
+                        {c.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </li>
                         {/* if user already dont exist show him login and register page initially false and if it exists then show him logout  */}
 
@@ -104,11 +130,14 @@ const Header = () => {
                   </li>
                 </>
               )}
+                <li className="nav-item">
+                <Badge count={cart?.length} showZero>   {/*that red circle on cart will show lemgth of how many products added*/}
+                  <NavLink to="/cart" className="nav-link">
+                    Cart
+                  </NavLink>
+                </Badge>
               
-              <li className="nav-item">
-                <NavLink to="/cart" className="nav-link">
-                  Cart (0)
-                </NavLink>
+              
               </li>
             </ul>
           </div>
