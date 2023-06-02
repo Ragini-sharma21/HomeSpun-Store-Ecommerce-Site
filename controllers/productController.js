@@ -6,6 +6,7 @@ import braintree from 'braintree';
 import orderModel from "../models/orderModel.js";
 import dotenv from "dotenv";
 
+dotenv.config();
 
 //payment gateway
 var gateway = new braintree.BraintreeGateway({
@@ -236,7 +237,7 @@ export const productCountController = async (req, res) => {
 // product list base on page
 export const productListController = async (req, res) => {
   try {
-    const perPage = 2;
+    const perPage = 3;
     const page = req.params.page ? req.params.page : 1;  //page kahn se aayega parhms mei se dynamically agr nhi milta toh default value one dedo
     const products = await productModel
 
@@ -358,7 +359,7 @@ export const brainTreePaymentController = async (req, res) => {
         amount: total,
         paymentMethodNonce: nonce,
         options: {
-          submitForSettlement: true,
+          submitForSettlement: true, //kya kya cheeze hum accept krege as payment method
         },
       },
       function (error, result) {

@@ -44,7 +44,7 @@ const Register=()=>{
     return(
         <Layout title="Register-HomeSpun">
 
-    <div className="form-container">
+    <div className="form-container" style={{ minHeight: "90vh" }}>
     
      
 
@@ -62,11 +62,13 @@ const Register=()=>{
     className="form-control"
      id="exampleInputName"
      placeholder="Enter Your Name" 
-     required />
+     required 
+     autoFocus/>
     </div>
     <div className="mb-3">
     
-    <input type="email" 
+    <input 
+    type="email" 
     value={email}
     onChange={(e)=> setEmail(e.target.value)}
     className="form-control" 
@@ -124,7 +126,7 @@ const Register=()=>{
     <input type="checkbox" className="form-check-input" id="exampleCheck1" required />
     <label className="form-check-label" htmlFor="exampleCheck1">Agree to our terms and conditions</label>
   </div>
-  <button type="submit" className="btn btn-primary">Submit</button>
+  <button type="submit" className="btn btn-primary">REGISTER</button>
 
 </form>
 

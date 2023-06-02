@@ -1,11 +1,23 @@
-import React from "react";
+import React ,{useState,useEffect} from "react";
 import Layout from "./../components/Layout/Layout";
 import { useCart } from "../context/cart";
 import { useAuth } from "../context/auth";
 import { useNavigate } from "react-router-dom";
+import DropIn from "braintree-web-drop-in-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import "../styles/CartStyles.css";
+
+
+
+//note the payment card where all options will show for payment ,all types of cards will be defalt using braintree package
+
 const CartPage = () => {
   const [auth, setAuth] = useAuth();
   const [cart, setCart] = useCart();
+  const [clientToken,setClientToken]=useState("");  //get token
+  const [instance, setInstance] = useState("");   //instance bhi hume API ke saath milega braintree ke
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   //total price
@@ -35,40 +47,81 @@ const CartPage = () => {
       console.log(error);
     }
   };
+
+  //get payment gateway token
+  const getToken = async () => {
+    try {
+      const { data } = await axios.get("/api/v1/product/braintree/token");
+      setClientToken(data?.clientToken);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getToken();
+  }, [auth?.token]);
+
+  //handle payments
+  const handlePayment = async () => {
+    try {
+      setLoading(true);
+      const { nonce } = await instance.requestPaymentMethod();
+      const { data } = await axios.post("/api/v1/product/braintree/payment", {
+        nonce,
+        cart,
+      });    //after doing payment reset everything
+      setLoading(false);
+      localStorage.removeItem("cart");
+      setCart([]);
+      navigate("/dashboard/user/orders");
+      toast.success("Payment Completed Successfully ");
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
-      <div className="container">
+    
+      <div className="cart-page">
         <div className="row">
           <div className="col-md-12">
             <h1 className="text-center bg-light p-2 mb-1">
-              {`Hello ${auth?.token && auth?.user?.name}`} {/*if user is login only then he would be able to view */}
-            </h1>
-            <h4 className="text-center">
+            {!auth?.user
+            ? "Hello Guest"
+              :`Hello ${auth?.token && auth?.user?.name}`} {/*if user is login only then he would be able to view */}
+            
+            <p className="text-center">
               {cart?.length
                 ? `You Have ${cart.length} items in your cart ${
                     auth?.token ? "" : "please login to view"   //conditions based on how many items in cart
                   }`
                 : " Your Cart Is Empty"}
-            </h4>
+                </p>
+            </h1>
           </div>
         </div>
+        <div className="container">
         <div className="row">
-          <div className="col-md-8">
+          <div className="col-md-7  p-0 m-0">
             {cart?.map((p) => (   //agr cart hai matlab empty nhi hai toh product se map krdo matlab product show krwa do
-              <div className="row mb-2 p-3 card flex-row">
+              <div className="row  card flex-row" key={p._id}>
                 <div className="col-md-4">
                   <img
                     src={`/api/v1/product/product-photo/${p._id}`}  //product images
                     className="card-img-top"
                     alt={p.name}
                     width="100px"
-                    height={"100px"}
+                    height={"130px"}
                   />
                 </div>
-                <div className="col-md-8">
+                <div className="col-md-4">
                   <p>{p.name}</p>
                   <p>{p.description.substring(0, 30)}</p>
                   <p>Price : {p.price}</p>
+                  </div>
+                  <div className="col-md-4 cart-remove-btn">
                   <button
                     className="btn btn-danger"
                     onClick={() => removeCartItem(p._id)}
@@ -120,8 +173,34 @@ const CartPage = () => {
                 )}
               </div>
             )}
+             <div className="mt-2">
+              {!clientToken || !auth?.token ||!cart?.length ? (
+                ""
+              ) : ( //condition
+                <>
+                  <DropIn    //package for payment gateway integration
+                    options={{
+                      authorization: clientToken,
+                      paypal: {
+                        flow: "vault",
+                      },
+                    }}
+                    onInstance={(instance) => setInstance(instance)}   //callback function
+                  />
+
+                  <button
+                    className="btn btn-primary"
+                    onClick={handlePayment}
+                    disabled={loading || !instance || !auth?.user?.address}   //isme se agr koi bhi state running hai toh button disable rhega 
+                  >
+                    {loading ? "Processing ...." : "Make Payment"}
+                  </button>
+                </>
+              )}
+              </div>
           </div>
         </div>
+      </div>
       </div>
     </Layout>
   );
