@@ -8,6 +8,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import cors from 'cors'
 import productRoutes from "./routes/productRoutes.js";
 import path from 'path';   //for hosting
+import {fileURLToPath} from 'url';
 
 //configure env
 dotenv.config(); //our env file is in root so we dont need to mention location 
@@ -15,6 +16,8 @@ dotenv.config(); //our env file is in root so we dont need to mention location
 
 
 connectDB(); //call database
+const __filename =fileURLToPath(import.meta.url);
+const __dirname=path.dirname(__filename);
 const app=express()     //call express 
 
 
